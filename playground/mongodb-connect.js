@@ -25,7 +25,7 @@ MongoClient.connect(uri, (err, client) => {
         console.log(JSON.stringify(result.ops, undefined, 2));
     }); */
 
-    db.collection('users').insertOne({
+    /* db.collection('users').insertOne({
         name: 'Kieran',
         age: 21,
         location: 'Manchester'
@@ -37,7 +37,13 @@ MongoClient.connect(uri, (err, client) => {
         const docCreated = result.ops[0];
         console.log(JSON.stringify(docCreated, undefined, 2));
         console.log(docCreated._id.getTimestamp());
-    });
+    }); */
 
-    client.close();
+
+    db.collection('todos').find({completed: false}).toArray().then(
+        todos => console.log(JSON.stringify(todos, undefined, 2)),
+        err => console.log('Failed to get todos')
+    );
+
+    //client.close();
 });
