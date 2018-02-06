@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/KChederz/Node-Todo-API#readme",
   "dependencies": {
-    "mongodb": "^3.0.2"
+    "mongodb": "^3.0.2",
+    "mongoose": "^5.0.3"
   }
 }
