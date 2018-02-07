@@ -1,47 +1,42 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// use promises and connect
-mongoose.Promise = global.Promise;
-const uri = `mongodb://admin:o4OHqmlXD30bcWFz@playground-shard-00-00-kn1ug.mongodb.net:27017,playground-shard-00-01-kn1ug.mongodb.net:27017,playground-shard-00-02-kn1ug.mongodb.net:27017/todoapp?ssl=true&replicaSet=Playground-shard-0&authSource=admin`
-mongoose.connect(uri);
+const mongoose = require('./db/mongoose');
+const Todo = require('./models/todo');
+const User = require('./models/user');
 
-const Todo = mongoose.model('Todo', {
-    text: {
-        type: String,
-        required: true,
-        trim: true,
-        minLength: 1
-    },
-    completed: {
-        type: Boolean,
-        default: false
-    },
-    completed_at: {
-        type: Date,
-        default: null
-    }
+const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/todos', (req, res) => {
+    const todo = new Todo({
+        text: req.body.text
+    });
+
+    todo.save().then(
+        doc => res.send(doc),
+        err => res.status(400).send(err)
+    );
 });
 
-const User = mongoose.model('User', {
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        minLength: 1
-    }
+app.listen(3000, () => {
+    console.log('Started on port 3000');
 });
 
+/*
 const newUser = new User({email: '   test@outlook.com   '});
 newUser.save().then(
     doc => console.log('User added', doc),
     error => console.log(error)
 );
 
-/* const newTodo = new Todo({
+const newTodo = new Todo({
     text: '  Do something else '
 });
 
 newTodo.save().then(
     doc => console.log('Todo added', doc),
     error => console.log(error)
-); */
+);
+*/
