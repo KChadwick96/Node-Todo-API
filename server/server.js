@@ -24,19 +24,12 @@ app.listen(3000, () => {
     console.log('Started on port 3000');
 });
 
+module.exports = app;
+
 /*
 const newUser = new User({email: '   test@outlook.com   '});
 newUser.save().then(
     doc => console.log('User added', doc),
-    error => console.log(error)
-);
-
-const newTodo = new Todo({
-    text: '  Do something else '
-});
-
-newTodo.save().then(
-    doc => console.log('Todo added', doc),
     error => console.log(error)
 );
 */
