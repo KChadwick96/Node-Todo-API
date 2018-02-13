@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '8'
+branches:
+  only:
+    - master
+deploy:
+  provider: gae
+  keyfile: client-secret.json
+  project: playground-195115
+  on: master
