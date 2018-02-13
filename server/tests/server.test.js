@@ -21,7 +21,10 @@ beforeEach(done => {
         .then(() => done());
 });
 
-after(() => server.close());
+after(done => {
+    server.close();
+    done();
+});
 
 describe('POST /todos', () => {
     it('should create a new todo', done => {
