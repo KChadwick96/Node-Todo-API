@@ -3,9 +3,12 @@ node_js:
 - '8'
 branches:
   only:
-    - master
+  - master
 deploy:
   provider: gae
   keyfile: client-secret.json
   project: playground-195115
   on: master
+before_install:
+- openssl aes-256-cbc -K $encrypted_dfc3deb37c0a_key -iv $encrypted_dfc3deb37c0a_iv
+  -in client-secret.json.enc -out client-secret.json -d
