@@ -3,7 +3,7 @@ const request = require('supertest');
 
 const {ObjectID} = require('mongodb');
 
-const app = require('../server');
+const {app, server} = require('../server');
 const Todo = require('../models/todo');
 const User = require('../models/user');
 
@@ -20,6 +20,8 @@ beforeEach(done => {
         .then(() => Todo.insertMany(todos))
         .then(() => done());
 });
+
+after(() => server.close());
 
 describe('POST /todos', () => {
     it('should create a new todo', done => {
