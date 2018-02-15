@@ -12,7 +12,9 @@ const todos = [{
     text: 'First test todo'
 }, {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completed_at: new Date()
 }];
 
 beforeEach(done => {
@@ -143,6 +145,48 @@ describe('DELETE /todos/:id', () => {
         request(app)
             .delete(`/todos/${id}`)
             .expect(404)
+            .end(done);
+    });
+});
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', done => {
+        const hexId = todos[0]._id.toHexString();
+        const update = {
+            text: 'Updated text',
+            completed: true
+        }
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(update)
+            .expect(200)
+            .expect(res => {
+                const todo = res.body.todo;
+                expect(todo.text).toBe(update.text);
+                expect(todo.completed).toBe(true);
+                expect(typeof todo.completed_at).toBe('string'); // will be a string since db does not return dates
+            })
+            .end(done);
+    });
+
+    it('should clear completed_at when todo is not completed', done => {
+        const hexId = todos[1]._id.toHexString();
+        const update = {
+            text: 'Some more updated text',
+            completed: false
+        }
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(update)
+            .expect(200)
+            .expect(res => {
+                const todo = res.body.todo;
+                expect(todo.text).toBe(update.text);
+                expect(todo.completed).toBe(false);
+                expect(todo.completed_at).toBe(null);
+            })
             .end(done);
     });
 });
