@@ -32,18 +32,35 @@ app.get('/todos', (req, res) => {
 app.get('/todos/:id', (req, res) => {
     const id = req.params.id;
     
-    // validate todo api
+    // validate todo id
     if (ObjectID.isValid(id) === false) {
         return res.status(404).send();
     }
 
-    Todo.findById(id).then(todo =>{
-        if (todo) {
-            res.send({todo});
-        } else {
+    Todo.findById(id).then(todo => {
+        if (!todo) {
             res.status(404).send();
         }
+
+        res.send({todo});
     }).catch(ex => res.status(400).send());
+});
+
+app.delete('/todos/:id', (req, res) => {
+    const id = req.params.id;
+
+    // validate todo id
+    if (ObjectID.isValid(id) === false) {
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then(todo => {
+        if (!todo) {
+            return res.status(404).send();
+        } 
+
+        res.send({todo});
+    });
 });
 
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
