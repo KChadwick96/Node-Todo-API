@@ -1,6 +1,6 @@
 const expect = require('expect');
 const request = require('supertest');
-
+const mongoose = require('mongoose');
 const {ObjectID} = require('mongodb');
 
 const {app, server} = require('../server');
@@ -25,6 +25,7 @@ beforeEach(done => {
 
 after(done => {
     server.close();
+    mongoose.connection.close();
     done();
 });
 
