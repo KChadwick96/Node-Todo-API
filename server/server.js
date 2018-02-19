@@ -15,12 +15,11 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
-    const todo = new Todo({
-        text: req.body.text
-    });
+    const body = _.pick(req.body, ['text']);
+    const todo = new Todo(body);
 
     todo.save().then(
-        doc => res.send(doc),
+        todo => res.send({todo}),
         err => res.status(400).send(err)
     );
 });
@@ -92,14 +91,16 @@ app.patch('/todos/:id', (req, res) => {
     }).catch(ex => res.status(400).send());
 });
 
+app.post('/users', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+    const user = new User(body);
+
+    user.save().then(
+        user => res.send({user}),
+        error => res.status(400).send()
+    );
+});
+
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
 
 module.exports = {app, server};
-
-/*
-const newUser = new User({email: '   test@outlook.com   '});
-newUser.save().then(
-    doc => console.log('User added', doc),
-    error => console.log(error)
-);
-*/
