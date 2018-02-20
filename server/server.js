@@ -18,10 +18,9 @@ app.post('/todos', (req, res) => {
     const body = _.pick(req.body, ['text']);
     const todo = new Todo(body);
 
-    todo.save().then(
-        todo => res.send({todo}),
-        err => res.status(400).send(err)
-    );
+    todo.save().then(doc => res.send(doc))
+        .catch(ex => res.status(400).send());
+    
 });
 
 app.get('/todos', (req, res) => {
@@ -95,10 +94,8 @@ app.post('/users', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
     const user = new User(body);
 
-    user.save().then(
-        user => res.send({user}),
-        error => res.status(400).send()
-    );
+    user.save().then(doc => res.send(doc))
+        .catch(ex => res.status(400).send());
 });
 
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
