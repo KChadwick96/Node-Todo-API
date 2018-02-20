@@ -20,10 +20,12 @@ const todos = [{
 beforeEach(done => {
     Todo.remove({})
         .then(() => Todo.insertMany(todos))
-        .then(() => done());
+        .then(() => done())
+        .catch(ex => console.log(ex));
 });
 
 after(done => {
+    console.log('Closing test');
     server.close();
     mongoose.connection.close();
     done();
