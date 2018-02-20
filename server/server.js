@@ -3,6 +3,7 @@ require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
 const mongoose = require('./db/mongoose');
@@ -106,6 +107,12 @@ app.post('/users', (req, res) => {
 
 app.get('/users/me', authenticate, (req, res) => {
     res.send({user: req.user});
+});
+
+app.post('/login', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+
+    //bcrypt.compare()
 });
 
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
