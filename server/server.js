@@ -3,11 +3,13 @@ require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
 const mongoose = require('./db/mongoose');
 const Todo = require('./models/todo');
 const User = require('./models/user');
+const {authenticate} = require('./middleware/authenticate');
 
 const port = process.env.PORT;
 const app = express();
@@ -15,14 +17,12 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
-    const todo = new Todo({
-        text: req.body.text
-    });
+    const body = _.pick(req.body, ['text']);
+    const todo = new Todo(body);
 
-    todo.save().then(
-        doc => res.send(doc),
-        err => res.status(400).send(err)
-    );
+    todo.save().then(doc => res.send(doc))
+        .catch(ex => res.status(400).send());
+    
 });
 
 app.get('/todos', (req, res) => {
@@ -79,7 +79,7 @@ app.patch('/todos/:id', (req, res) => {
     if (_.isBoolean(body.completed) && body.completed) {
         body.completed_at = new Date();
     } else {
-        body.complted = false;
+        body.completed = false;
         body.completed_at = null;
     }
 
@@ -92,14 +92,29 @@ app.patch('/todos/:id', (req, res) => {
     }).catch(ex => res.status(400).send());
 });
 
+app.post('/users', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+    const user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    })
+    .then(token => {
+        res.header('x-auth', token).send({user});
+    })
+    .catch(ex => res.status(400).send());
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send({user: req.user});
+});
+
+app.post('/login', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+
+    //bcrypt.compare()
+});
+
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
 
 module.exports = {app, server};
-
-/*
-const newUser = new User({email: '   test@outlook.com   '});
-newUser.save().then(
-    doc => console.log('User added', doc),
-    error => console.log(error)
-);
-*/
