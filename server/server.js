@@ -77,7 +77,7 @@ app.patch('/todos/:id', (req, res) => {
     if (_.isBoolean(body.completed) && body.completed) {
         body.completed_at = new Date();
     } else {
-        body.complted = false;
+        body.completed = false;
         body.completed_at = null;
     }
 
@@ -94,8 +94,13 @@ app.post('/users', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
     const user = new User(body);
 
-    user.save().then(doc => res.send(doc))
-        .catch(ex => res.status(400).send());
+    user.save().then(() => {
+        return user.generateAuthToken();
+    })
+    .then(token => {
+        res.header('x-auth', token).send({user});
+    })
+    .catch(ex => res.status(400).send());
 });
 
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
