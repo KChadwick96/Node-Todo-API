@@ -6,23 +6,10 @@ const {ObjectID} = require('mongodb');
 const {app, server} = require('../server');
 const Todo = require('../models/todo');
 const User = require('../models/user');
+const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
-const todos = [{
-    _id: new ObjectID(),
-    text: 'First test todo'
-}, {
-    _id: new ObjectID(),
-    text: 'Second test todo',
-    completed: true,
-    completed_at: new Date()
-}];
-
-beforeEach(done => {
-    Todo.remove({})
-        .then(() => Todo.insertMany(todos))
-        .then(() => done())
-        .catch(ex => console.log(ex));
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 after(done => {
     console.log('Closing test');
@@ -192,4 +179,54 @@ describe('PATCH /todos/:id', () => {
             })
             .end(done);
     });
+});
+
+describe('GET /users/me', () => {
+    it('should return user if authenticated', done => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.user._id).toBe(users[0]._id.toHexString())
+                expect(res.body.user.email).toBe(users[0].email);
+            })
+            .end(done);
+    });
+
+    it('should return 401 if not authenticated', done => {
+        request(app)
+            .get('/users/me')
+            .expect(401)
+            .expect(res => {
+                expect(res.body).toEqual({});
+            })
+            .end(done);
+    });
+});
+
+describe('POST /users', () => {
+    it('should create a user', done => {
+        const email = 'example@example.com';
+        const password = 'testpassword123';
+
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(200)
+            .expect(res => {
+                expect(res.headers['x-auth']).toBeTruthy();
+                expect(res.body.user._id).toBeTruthy();
+                expect(res.body.user.email).toBe(email)
+            })
+            .end(done);
+    });
+
+    /* it('should return validation erros if request invalid', done => {
+
+    });
+
+    it('should not create user if email in use', done => {
+
+    }); */
 });
