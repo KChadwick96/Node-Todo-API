@@ -81,9 +81,7 @@ Schema.statics.findByCredentials = function(email, password) {
         }
 
         return bcrypt.compare(password, user.password).then(res => {
-            console.log(res);
             if (res) {
-                console.log(user);
                 return user;
             } else {
                 reject();
