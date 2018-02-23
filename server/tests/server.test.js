@@ -219,14 +219,46 @@ describe('POST /users', () => {
                 expect(res.body.user._id).toBeTruthy();
                 expect(res.body.user.email).toBe(email)
             })
+            .end(err => {
+                if (err) { 
+                    return done(err);
+                }
+
+                User.findOne({email}).then(user => {
+                    expect(user).toBeTruthy();
+                    expect(user.password.length).toEqual(60);
+                    done();
+                });
+            });
+    });
+
+    it('should return validation errors if request invalid', done => {
+        const email = 'invalidemail';
+        const password = 'abc'; // less than 6 chars
+
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(400)
+            .expect(res => {
+                expect(res.headers['x-auth']).toBeFalsy();
+                expect(res.body).toEqual({});
+            })
             .end(done);
     });
 
-    /* it('should return validation erros if request invalid', done => {
-
-    });
-
     it('should not create user if email in use', done => {
+        const email = users[0].email;
+        const password = 'testpassword'; // less than 6 chars
 
-    }); */
+        request(app)
+            .post('/users')
+            .send({email, password})
+            .expect(400)
+            .expect(res => {
+                expect(res.headers['x-auth']).toBeFalsy();
+                expect(res.body).toEqual({});
+            })
+            .end(done);
+    });
 });

@@ -96,13 +96,14 @@ app.post('/users', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
     const user = new User(body);
 
-    user.save().then(() => {
-        return user.generateAuthToken();
-    })
-    .then(token => {
-        res.header('x-auth', token).send({user});
-    })
-    .catch(ex => res.status(400).send());
+    user.save()
+        .then(() => {
+            return user.generateAuthToken();
+        })
+        .then(token => {
+            res.header('x-auth', token).send({user});
+        })
+        .catch(ex => res.status(400).send());
 });
 
 app.get('/users/me', authenticate, (req, res) => {
