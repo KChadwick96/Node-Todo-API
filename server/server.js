@@ -110,10 +110,14 @@ app.get('/users/me', authenticate, (req, res) => {
     res.send({user: req.user});
 });
 
-app.post('/login', (req, res) => {
+app.post('/users/login', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
-
-    //bcrypt.compare()
+    
+    User.findByCredentials(body.email, body.password).then(user => {
+        return user.generateAuthToken().then(token => {
+            res.header('x-auth', token).send({user});
+        });
+    }).catch(ex => res.status(400).send());
 });
 
 const server = app.listen(port, () => console.log(`Started on port ${port}`));
