@@ -110,6 +110,11 @@ app.get('/users/me', authenticate, (req, res) => {
     res.send({user: req.user});
 });
 
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => res.send())
+        .catch(ex => res.status(400).send());
+});
+
 app.post('/users/login', (req, res) => {
     const body = _.pick(req.body, ['email', 'password']);
     
