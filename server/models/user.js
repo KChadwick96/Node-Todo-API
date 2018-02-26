@@ -55,6 +55,16 @@ Schema.methods.generateAuthToken = function() {
     });
 }
 
+Schema.methods.removeToken = function(token) {
+    const user = this;
+
+    return user.update({
+        $pull: {
+            tokens: {token}
+        }
+    });
+}
+
 Schema.statics.findByToken = function(token) {
     const User = this;
     let decoded;
@@ -69,6 +79,24 @@ Schema.statics.findByToken = function(token) {
         '_id': decoded._id,
         'tokens.token': token,
         'tokens.access': 'auth'
+    });
+}
+
+Schema.statics.findByCredentials = function(email, password) {
+    const User = this;
+
+    return User.findOne({email}).then(user => {
+        if (!user) {
+            return Promise.reject();
+        }
+
+        return bcrypt.compare(password, user.password).then(res => {
+            if (res) {
+                return user;
+            } else {
+                reject();
+            }
+        });
     });
 }
 
